@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Express Learning Online - Aprende Inglés con Confianza</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #6ECBF5;
+            --light-blue: #B8E6F9;
+            --lighter-blue: #E3F4FC;
+            --accent-blue: #2A9DF4;
+            --text-dark: #2C3E50;
+            --text-light: #5D7790;
+            --white: #FFFFFF;
+            --light-gray: #F8FAFD;
+            --border-radius: 12px;
+            --shadow: 0 8px 20px rgba(106, 203, 245, 0.15);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Ventana Emergente de Publicidad */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-content {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.4s ease;
+        }
+
+        .popup-overlay.active .popup-content {
+            transform: translateY(0);
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .popup-close:hover {
+            color: var(--accent-blue);
+            transform: rotate(90deg);
+        }
+
+        .popup-logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .popup-logo .logo {
+            font-size: 28px;
+            color: var(--accent-blue);
+            margin-bottom: 10px;
+        }
+
+        .popup-logo i {
+            color: var(--primary-blue);
+            margin-right: 10px;
+        }
+
+        .popup-content h2 {
+            text-align: center;
+            color: var(--accent-blue);
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .popup-content p {
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 25px;
+        }
+
+        .popup-highlight {
+            background-color: var(--lighter-blue);
+            border-left: 4px solid var(--accent-blue);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .popup-highlight strong {
+            color: var(--accent-blue);
+            font-size: 1.2rem;
+        }
+
+        /* Header y Navegación */
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--accent-blue);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 8px;
+            color: var(--primary-blue);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 5px;
+        }
+
+        .nav-menu li {
+            position: relative;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 16px;
+            padding: 10px 18px;
+            border-radius: 20px;
+            transition: var(--transition);
+        }
+
+        .nav-menu a:hover {
+            background-color: var(--lighter-blue);
+            color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white !important;
+            padding: 10px 22px !important;
+            border-radius: 30px !important;
+            box-shadow: 0 4px 12px rgba(42, 157, 244, 0.3);
+            margin-left: 5px;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(42, 157, 244, 0.4);
+        }
+
+        /* Banner Principal */
+        .hero {
+            padding: 60px 0 40px;
+            background: linear-gradient(135deg, var(--lighter-blue) 0%, var(--white) 100%);
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+            margin-bottom: 40px;
+        }
+
+        .hero-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .hero-content h1 {
+            font-size: 2.8rem;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+
+        .hero-content h1 span {
+            color: var(--accent-blue);
+            background-color: var(--light-blue);
+            padding: 0 8px;
+            border-radius: 8px;
+        }
+
+        .hero-content p {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 30px;
+        }
+
+        .highlight {
+            background-color: rgba(110, 203, 245, 0.2);
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--accent-blue);
+            margin: 25px 0;
+        }
+
+        /* Banner Interactivo */
+        .banner-container {
+            position: relative;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            height: 400px;
+        }
+
+        .main-banner {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .banner-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 60px;
+            border-radius: 8px;
+            cursor: pointer;
+            object-fit: cover;
+            opacity: 0.7;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .thumbnail:hover, .thumbnail.active {
+            opacity: 1;
+            border-color: var(--accent-blue);
+            transform: scale(1.05);
+        }
+
+        /* Sección de Embajadores */
+        .ambassadors-section {
+            padding: 60px 0;
+            background-color: var(--light-gray);
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .ambassadors-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .ambassador-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .ambassador-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(106, 203, 245, 0.2);
+        }
+
+        .ambassador-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .ambassador-letter {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .ambassador-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .ambassador-content {
+            padding: 25px;
+        }
+
+        .ambassador-content h4 {
+            color: var(--accent-blue);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .ambassador-details {
+            list-style: none;
+        }
+
+        .ambassador-details li {
+            margin-bottom: 12px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .ambassador-details li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--primary-blue);
+            font-weight: bold;
+        }
+
+        /* Sección de Misión y Visión */
+        .mission-section {
+            padding: 60px 0;
+            background-color: var(--white);
+            margin-bottom: 50px;
+        }
+
+        .mission-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .mission-card, .vision-card {
+            background-color: var(--lighter-blue);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .mission-card h3, .vision-card h3 {
+            color: var(--accent-blue);
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+
+        .mission-card h3 i, .vision-card h3 i {
+            margin-right: 15px;
+            font-size: 2rem;
+        }
+
+        .mission-card p, .vision-card p {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        /* Sección de Cursos */
+        .courses-section {
+            padding: 60px 0;
+            background-color: var(--light-gray);
+            margin-bottom: 50px;
+            border-radius: 30px;
+        }
+
+        .courses-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .course-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .course-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .course-icon {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            font-size: 2.5rem;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .course-content {
+            padding: 25px;
+        }
+
+        .course-content h4 {
+            color: var(--accent-blue);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .course-content p {
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        /* Centro de Ayuda (FAQ) */
+        .help-section {
+            padding: 60px 0;
+            background-color: var(--white);
+            margin-bottom: 50px;
+        }
+
+        .help-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .faq-categories {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .category-btn {
+            background-color: var(--lighter-blue);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .category-btn.active, .category-btn:hover {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+        }
+
+        .faq-container {
+            background-color: var(--light-gray);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--light-blue);
+        }
+
+        .faq-question {
+            padding: 20px 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--white);
+            transition: var(--transition);
+        }
+
+        .faq-question:hover {
+            background-color: var(--lighter-blue);
+        }
+
+        .faq-question h4 {
+            color: var(--text-dark);
+            font-size: 1.2rem;
+        }
+
+        .faq-icon {
+            color: var(--accent-blue);
+            transition: var(--transition);
+        }
+
+        .faq-answer {
+            padding: 0 25px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            background-color: var(--white);
+        }
+
+        .faq-answer p {
+            padding: 20px 0;
+            color: var(--text-light);
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Botones */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            box-shadow: 0 4px 12px rgba(42, 157, 244, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 18px rgba(42, 157, 244, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--accent-blue);
+            border: 2px solid var(--primary-blue);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--lighter-blue);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--text-dark);
+            color: var(--white);
+            padding: 40px 0 20px;
+            margin-top: 60px;
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .footer-section h4 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--primary-blue);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul li a {
+            color: var(--light-blue);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-section ul li a:hover {
+            color: var(--primary-blue);
+            padding-left: 5px;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--light-blue);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero-container, .mission-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .ambassadors-container, .courses-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .faq-categories {
+                flex-direction: column;
+            }
+            
+            .category-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Ventana Emergente de Publicidad -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-content">
+            <button class="popup-close" id="popupClose">&times;</button>
+            
+            <div class="popup-logo">
+                <div class="logo">
+                    <i class="fas fa-bolt"></i> Express Learning Online
+                </div>
+                <p>¡Oferta especial de lanzamiento!</p>
+            </div>
+            
+            <h2>¡30% DE DESCUENTO!</h2>
+            
+            <p>Aprovecha nuestra promoción exclusiva para nuevos estudiantes. Matrícula gratis + primer mes con 30% de descuento.</p>
+            
+            <div class="popup-highlight">
+                <strong>Válido solo por 24 horas</strong>
+                <p>Esta oferta se activa al hacer clic en el botón de abajo</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="https://paginaweb2025.elon.school/" class="btn btn-primary" style="display: inline-block; margin-bottom: 15px;">
+                    <i class="fas fa-gift"></i> ¡Quiero mi descuento!
+                </a>
+                <p style="font-size: 0.9rem; color: var(--text-light);">
+                    <i class="fas fa-clock"></i> Oferta válida hasta agotar existencias
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header con Menú -->
+    <header>
+        <div class="container nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-bolt"></i> Express Learning Online
+            </a>
+            
+            <ul class="nav-menu">
+                <li><a href="#" class="active">Inicio</a></li>
+                <li><a href="#cursos">Cursos</a></li>
+                <li><a href="#certificaciones">Certificaciones</a></li>
+                <li><a href="#regalos">Obtén regalos</a></li>
+                <li><a href="#blog">Blog</a></li>
+                <li><a href="https://paginaweb2025.elon.school/" class="btn-register">Registrarme</a></li>
+            </ul>
+            
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Sección Hero -->
+    <section class="hero">
+        <div class="container hero-container">
+            <div class="hero-content">
+                <h1>Hasta <span>30%</span> de descuento en tu primer curso</h1>
+                <p>Este 2026, elige el propósito que sí se cumple. Aprender inglés no tiene que quedarse en la lista de deseos. En Express Learning Online te ayudamos a lograrlo con métodos modernos y una experiencia diseñada para adolescentes.</p>
+                
+                <div class="highlight">
+                    <p><i class="fas fa-star"></i> <strong>Di con confianza:</strong> Yes en Inglés. 🎉</p>
+                </div>
+                
+                <div class="action-buttons">
+                    <a href="https://paginaweb2025.elon.school/" class="btn btn-primary">Inscríbete ahora</a>
+                    <a href="#cursos" class="btn btn-secondary">Ver cursos</a>
+                </div>
+                
+                <p style="margin-top: 15px; font-size: 0.9rem; color: var(--text-light);">
+                    <i class="fas fa-info-circle"></i> Consulta los Términos y Condiciones
+                </p>
+            </div>
+            
+            <div class="banner-wrapper">
+                <div class="banner-container">
+                    <img src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Estudiantes aprendiendo inglés" class="main-banner" id="mainBanner">
+                    
+                    <div class="banner-controls">
+                        <img src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Miniatura 1" class="thumbnail active" data-full="https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80">
+                        <img src="https://images.unsplash.com/photo-1524178234883-043d5c3f3cf4?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Miniatura 2" class="thumbnail" data-full="https://images.unsplash.com/photo-1524178234883-043d5c3f3cf4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80">
+                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Miniatura 3" class="thumbnail" data-full="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80">
+                        <img src="https://images.unsplash.com/photo-1553877522-43269d4ea984?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Miniatura 4" class="thumbnail" data-full="https://images.unsplash.com/photo-1553877522-43269d4ea984?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Embajadores -->
+    <section class="ambassadors-section" id="certificaciones">
+        <div class="container">
+            <h2 class="section-title">¡Nuestros Embajadores Internacionales!</h2>
+            <p class="section-subtitle">Orgullosamente egresados de Express Learning Online. Conoce sus historias de éxito.</p>
+            
+            <div class="ambassadors-container">
+                <div class="ambassador-card">
+                    <div class="ambassador-header">
+                        <div class="ambassador-letter">A</div>
+                        <div class="ambassador-name">Akira</div>
+                    </div>
+                    <div class="ambassador-content">
+                        <h4>Estratega y Líder</h4>
+                        <ul class="ambassador-details">
+                            <li><strong>Apariencia:</strong> Joven con traje de combate</li>
+                            <li><strong>Habilidad:</strong> Estrategia y liderazgo</li>
+                            <li><strong>Debilidad:</strong> Se preocupa demasiado por sus compañeros</li>
+                            <li><strong>Logro:</strong> Dominó el inglés en solo 6 meses</li>
+                            <li><strong>Certificación:</strong> Nivel Avanzado C1</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="ambassador-card">
+                    <div class="ambassador-header">
+                        <div class="ambassador-letter">B</div>
+                        <div class="ambassador-name">Bianca</div>
+                    </div>
+                    <div class="ambassador-content">
+                        <h4>Comunicadora Internacional</h4>
+                        <ul class="ambassador-details">
+                            <li><strong>Apariencia:</strong> Estudiante universitaria moderna</li>
+                            <li><strong>Habilidad:</strong> Comunicación intercultural</li>
+                            <li><strong>Debilidad:</strong> Perfeccionista en la pronunciación</li>
+                            <li><strong>Logro:</strong> Consiguió beca en el extranjero</li>
+                            <li><strong>Certificación:</strong> IELTS 8.0</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="ambassador-card">
+                    <div class="ambassador-header">
+                        <div class="ambassador-letter">C</div>
+                        <div class="ambassador-name">Carlos</div>
+                    </div>
+                    <div class="ambassador-content">
+                        <h4>Emprendedor Digital</h4>
+                        <ul class="ambassador-details">
+                            <li><strong>Apariencia:</strong> Joven profesional con laptop</li>
+                            <li><strong>Habilidad:</strong> Negociación en inglés</li>
+                            <li><strong>Debilidad:</strong> A veces habla muy rápido</li>
+                            <li><strong>Logro:</strong> Expandió su negocio a 3 países</li>
+                            <li><strong>Certificación:</strong> Inglés para Negocios B2</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="https://paginaweb2025.elon.school/" class="btn btn-primary">
+                    <i class="fas fa-user-graduate"></i> CONÓCELOS A TODOS
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Misión y Visión -->
+    <section class="mission-section">
+        <div class="container mission-container">
+            <div class="mission-card">
+                <h3><i class="fas fa-bullseye"></i> MISIÓN</h3>
+                <p>Potenciar el aprendizaje de nuestros estudiantes a través de Ambientes Virtuales de Aprendizaje, inmersos en ejemplos del mundo real. Aprovechamos el contexto personal y laboral de cada estudiante para ayudarles a desarrollar un dominio práctico y significativo de las habilidades de comunicación en inglés.</p>
+            </div>
+            
+            <div class="vision-card">
+                <h3><i class="fas fa-eye"></i> VISIÓN</h3>
+                <p>Consolidarnos como líderes indiscutibles en la enseñanza de idiomas en línea, utilizando métodos y aplicaciones didácticas innovadoras y de vanguardia. A través de plataformas de aprendizaje de última generación, buscamos capacitar a nuestros estudiantes para que sean bilingües en el corto plazo y altamente competitivos en cualquier parte del mundo.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Cursos -->
+    <section class="courses-section" id="cursos">
+        <div class="container">
+            <h2 class="section-title">Nuestros Cursos</h2>
+            <p class="section-subtitle">Explora nuestras opciones y encuentra el curso ideal para ti. ¡Solicita más información y pregunta por nuestras promociones de este mes!</p>
+            
+            <div class="courses-container">
+                <div class="course-card">
+                    <div class="course-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="course-content">
+                        <h4>Inglés para Adolescentes</h4>
+                        <p>Curso diseñado específicamente para jóvenes de 13 a 18 años. Contenido moderno, interactivo y enfocado en sus intereses.</p>
+                        <a href="https://paginaweb2025.elon.school/" class="btn btn-primary">Más información</a>
+                    </div>
+                </div>
+                
+                <div class="course-card">
+                    <div class="course-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="course-content">
+                        <h4>Inglés para Negocios</h4>
+                        <p>Desarrolla las habilidades necesarias para comunicarte efectivamente en el entorno profesional internacional.</p>
+                        <a href="https://paginaweb2025.elon.school/" class="btn btn-primary">Más información</a>
+                    </div>
+                </div>
+                
+                <div class="course-card">
+                    <div class="course-icon">
+                        <i class="fas fa-passport"></i>
+                    </div>
+                    <div class="course-content">
+                        <h4>Preparación para Exámenes</h4>
+                        <p>Preparación especializada para TOEFL, IELTS, Cambridge y otros exámenes de certificación internacional.</p>
+                        <a href="https://paginaweb2025.elon.school/" class="btn btn-primary">Más información</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Centro de Ayuda (FAQ) -->
+    <section class="help-section">
+        <div class="container help-container">
+            <h2 class="section-title">Centro de Ayuda</h2>
+            <p class="section-subtitle">¿En qué podemos ayudarte? Selecciona una categoría para ver las preguntas frecuentes</p>
+            
+            <div class="faq-categories">
+                <button class="category-btn active" data-category="all">Todas</button>
+                <button class="category-btn" data-category="metodologia">Metodología</button>
+                <button class="category-btn" data-category="cursos">Cursos</button>
+                <button class="category-btn" data-category="inscripcion">Inscripción</button>
+                <button class="category-btn" data-category="pagos">Pagos y Costos</button>
+                <button class="category-btn" data-category="plataforma">Plataforma</button>
+                <button class="category-btn" data-category="certificaciones">Certificaciones</button>
+            </div>
+            
+            <div class="faq-container">
+                <div class="faq-item" data-category="metodologia">
+                    <div class="faq-question">
+                        <h4>¿Cuál es el método de enseñanza de Express Learning Online?</h4>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Nuestro método se basa en Ambientes Virtuales de Aprendizaje inmersivos, utilizando ejemplos del mundo real y contextos personales y laborales para desarrollar habilidades prácticas de comunicación.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="cursos">
+                    <div class="faq-question">
+                        <h4>¿Qué tipos de cursos ofrecen?</h4>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Ofrecemos cursos para adolescentes, inglés para negocios, preparación para exámenes internacionales y programas personalizados según tus necesidades específicas.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="inscripcion">
+                    <div class="faq-question">
+                        <h4>¿Cuál es el proceso de inscripción?</h4>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>El proceso es simple: 1) Completa el formulario de registro, 2) Agenda una evaluación de nivel, 3) Elige tu curso y horario, 4) Realiza el pago, 5) ¡Comienza a aprender!</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="pagos">
+                    <div class="faq-question">
+                        <h4>¿Qué métodos de pago aceptan?</h4>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Aceptamos tarjetas de crédito/débito, transferencias bancarias, PayPal y pagos en efectivo en nuestras oficinas autorizadas.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="plataforma">
+                    <div class="faq-question">
+                        <h4>¿Cómo funciona la plataforma en línea?</h4>
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Nuestra plataforma es 100% online y accesible desde cualquier dispositivo. Incluye clases en vivo, material interactivo, ejercicios prácticos y seguimiento personalizado de tu progreso.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" data-category="certificaciones">
+                    <div class="
